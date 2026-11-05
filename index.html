@@ -333,7 +333,6 @@ body.guide-aktiv { padding-bottom: 70vh; } /* giver plads til at rulle boblen he
 <div id="side-soeg">
   <header class="top">
     <div class="indhold">
-      <button type="button" id="vis-guide" class="guide-genstart">Sådan virker siden</button>
       <h1>Find hjælp til <span class="brand">InterCount</span></h1>
       <p class="intro">Skriv med dine egne ord, hvad du gerne vil gøre. Så finder vi den instruktionsvideo, der bedst viser hvordan – og hvor i videoen du skal kigge.</p>
       <div id="soegeform" class="soegeform" role="search">
@@ -378,46 +377,6 @@ body.guide-aktiv { padding-bottom: 70vh; } /* giver plads til at rulle boblen he
 
 </div>
 
-<button type="button" id="hjaelp-knap" class="hjaelp-knap" aria-haspopup="dialog" aria-controls="hjaelp-dialog">
-  <span aria-hidden="true" class="hjaelp-ikon">?</span> Har du brug for hjælp?
-</button>
-<dialog id="hjaelp-dialog" class="hjaelp-dialog" aria-labelledby="hjaelp-titel">
-  <div class="hjaelp-hoved">
-    <h2 id="hjaelp-titel">Har du brug for hjælp?</h2>
-    <button type="button" class="hjaelp-luk" data-luk aria-label="Luk">✕</button>
-  </div>
-  <p class="hjaelp-intro">Kan du ikke finde svaret i videoerne, kan du kontakte en af disse:</p>
-  <div class="hjaelp-kort">
-    <section class="kontakt">
-      <h3>Velas</h3>
-      <p class="kontakt-rolle">Kontakt receptionen</p>
-      <ul class="kontakt-linjer">
-        <li><span class="etiket">Telefon</span> <a href="tel:+4570154000">70 15 40 00</a></li>
-        <li><span class="etiket">Mail</span> <a href="mailto:velas@velas.dk">velas@velas.dk</a></li>
-      </ul>
-      <p class="etiket">Åbningstider</p>
-      <table class="tider"><tr><td>Mandag – torsdag</td><td>kl. 8.00 – 16.00</td></tr><tr><td>Fredag</td><td>kl. 8.00 – 13.00</td></tr></table>
-      <div class="kontakt-ekstra">
-        <p><strong>Find din rådgiver i Velas</strong><br>Vælg »område«, »lokation« og »rolle« for at finde den rigtige person at kontakte.</p>
-        <a class="kontakt-link" href="https://velas.dk/kontakt/" target="_blank" rel="noopener">Se Velas' kontakter →</a>
-      </div>
-    </section>
-    <section class="kontakt">
-      <h3>InterCount support</h3>
-      <p class="kontakt-rolle">Hjælp til selve InterCount-systemet</p>
-      <ul class="kontakt-linjer">
-        <li><span class="etiket">Telefon</span> <a href="tel:+4587405040">87 40 50 40</a></li>
-        <li><span class="etiket">Mail</span> <a href="mailto:support@intercount.dk">support@intercount.dk</a></li>
-      </ul>
-      <p class="etiket">Åbningstider</p>
-      <table class="tider"><tr><td>Mandag – torsdag</td><td>kl. 8.00 – 16.00</td></tr><tr><td>Fredag</td><td>kl. 8.00 – 15.30</td></tr></table>
-      <div class="kontakt-ekstra">
-        <p><strong>Skriftlige vejledninger</strong><br>InterCount har også vejledninger på deres hjemmeside.</p>
-        <a class="kontakt-link" href="https://intercount.dk/support/vejledninger/" target="_blank" rel="noopener">Se InterCounts vejledninger →</a>
-      </div>
-    </section>
-  </div>
-</dialog>
 
 <div id="side-admin" hidden>
   <header class="top">
@@ -1434,12 +1393,6 @@ body.guide-aktiv { padding-bottom: 70vh; } /* giver plads til at rulle boblen he
       const n = d.resultater.length;
       visBesked(n === 1 ? "1 video passer til dit spørgsmål." : n + " videoer passer til dit spørgsmål – den bedste står øverst.");
     } else visBesked(d.besked, typer[d.status]);
-    if (d.status !== "ok" && d.status !== "ugyldig") {
-      const hb = el("p", "besked-hjaelp");
-      hb.appendChild(document.createTextNode("Finder du ikke det, du leder efter? "));
-      hb.appendChild(knap("Har du brug for hjælp?", "link", () => $("hjaelp-dialog").showModal()));
-      $("besked").appendChild(hb);
-    }
     $("resultater").replaceChildren(...d.resultater.map(resultatKort));
   }
 
@@ -2276,105 +2229,6 @@ body.guide-aktiv { padding-bottom: 70vh; } /* giver plads til at rulle boblen he
     window.addEventListener("hashchange", visRute);
     visRute();
 
-    // ---------------------------------------------------------------- rundvisning i tre trin
-    const GUIDE_NOEGLE = "intercount-videosoeg:guide-set";
-    const GUIDE = [
-      { maal: () => $("soegeform"), titel: "Sådan virker søgefunktionen",
-        tekst: "Skriv med dine egne ord, hvad du vil gøre i InterCount – fx »Hvordan sender jeg en faktura?«. Siden finder de videoer, der passer bedst, og viser den bedste øverst. Ofte kan du springe direkte til det sted i videoen, hvor svaret er." },
-      { maal: () => $("eksempler"), titel: "Sådan virker populære spørgsmål",
-        tekst: "Her står de spørgsmål, som flest har brug for svar på. Klik på et af dem, så søger siden for dig – du behøver ikke skrive noget selv." },
-      { maal: () => $("emner"), titel: "Sådan virker videobiblioteket",
-        tekst: "Klik på »Se videoer efter emne« for at se alle vejledninger samlet og sorteret efter emne. Her kan du bladre i ro og mag og starte en video med ét klik. Efter en søgning finder du biblioteket under fanen »Alle videoer«.",
-        foer: () => { const f = document.querySelector(".emne-fold"); if (f && !f.hidden) f.click(); },
-        efter: () => { const t = document.querySelector(".emne-titel"); if (t && !t.hidden) t.click(); } },
-    ];
-    let guideTrin = -1;
-    const lag = el("div", "guide-lag"); lag.hidden = true;
-    const lys = el("div", "guide-lys"); lys.hidden = true;
-    const boble = el("div", "guide-boble"); boble.hidden = true;
-    boble.setAttribute("role", "dialog"); boble.setAttribute("aria-modal", "true"); boble.setAttribute("aria-labelledby", "guide-titel");
-    document.body.append(lag, lys, boble);
-    const placer = () => {
-      if (guideTrin < 0) return;
-      const r = GUIDE[guideTrin].maal().getBoundingClientRect(), pad = 10;
-      Object.assign(lys.style, { top: r.top + scrollY - pad + "px", left: r.left + scrollX - pad + "px", width: r.width + pad * 2 + "px", height: r.height + pad * 2 + "px" });
-      const bw = boble.offsetWidth, bh = boble.offsetHeight, vw = document.documentElement.clientWidth;
-      let left = Math.min(Math.max(16, r.left), vw - bw - 16);
-      let top = r.bottom + pad + 16;
-      const pladsUnder = top + bh <= innerHeight - 8, pladsOver = r.top - pad - 16 - bh >= 8;
-      if (!pladsUnder && pladsOver) top = r.top - pad - 16 - bh;
-      boble.style.left = left + scrollX + "px";
-      boble.style.top = top + scrollY + "px";
-      boble.classList.toggle("over", top < r.top);
-      boble.style.setProperty("--pil-x", Math.min(Math.max(28, r.left + 40 - left), bw - 28) + "px");
-      return { under: top >= r.top, nederst: top + bh, oeverst: r.top - pad, bobleTop: top };
-    };
-    // Sørger for, at både det oplyste område og boblen kan ses på skærmen.
-    const tilpasRul = () => {
-      const p = placer();
-      if (!p) return;
-      if (p.nederst > innerHeight - 12) {
-        const behov = p.nederst - innerHeight + 12;
-        // helst uden at skjule toppen af det oplyste område, men boblen skal altid kunne ses
-        const ryk = behov <= p.oeverst - 12 ? behov : Math.min(behov, Math.max(0, p.bobleTop - 8));
-        scrollBy(0, ryk);
-      }
-    };
-    const visTrin = (i) => {
-      if (guideTrin >= 0 && GUIDE[guideTrin].efter && i !== guideTrin) GUIDE[guideTrin].efter();
-      guideTrin = i;
-      const t = GUIDE[i];
-      if (t.foer) t.foer();
-      document.querySelectorAll(".guide-maal").forEach((x) => x.classList.remove("guide-maal"));
-      t.maal().classList.add("guide-maal");
-      boble.replaceChildren();
-      const prik = el("div", "guide-prikker");
-      GUIDE.forEach((_, j) => prik.appendChild(el("span", j <= i ? "aktiv" : "")));
-      boble.appendChild(el("p", "guide-trin-nr", "Trin " + (i + 1) + " af " + GUIDE.length));
-      const h = el("h2", "guide-titel", t.titel); h.id = "guide-titel";
-      boble.append(h, el("p", "guide-tekst", t.tekst));
-      const fod = el("div", "guide-fod");
-      fod.appendChild(prik);
-      const kn = el("div", "guide-knapper");
-      if (i > 0) kn.appendChild(knap("← Tilbage", "sekundaer", () => visTrin(i - 1)));
-      if (i < GUIDE.length - 1) {
-        kn.prepend(knap("Spring over", "link guide-spring", afslutGuide));
-        kn.appendChild(knap("Næste →", null, () => visTrin(i + 1)));
-      }
-      fod.appendChild(kn);
-      boble.appendChild(fod);
-      if (i === GUIDE.length - 1) {
-        const cta = el("button", "valg-knap primaer guide-cta-knap");
-        cta.type = "button";
-        cta.innerHTML = '<span class="valg-ikon" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg></span><span class="valg-titel">Benyt søgefunktionen</span><span class="valg-tekst">Skriv med dine egne ord, hvad du vil gøre, og find den rigtige video.</span><span class="valg-pil" aria-hidden="true">→</span>';
-        cta.addEventListener("click", afslutGuide);
-        boble.appendChild(cta);
-      }
-      [lag, lys, boble].forEach((x) => (x.hidden = false));
-      document.body.classList.add("guide-aktiv");
-      const rr = t.maal().getBoundingClientRect();
-      scrollBy(0, rr.top - Math.max(16, Math.min(120, innerHeight * 0.12)));
-      requestAnimationFrame(() => { tilpasRul(); const b = boble.querySelector(".guide-cta-knap") || boble.querySelector(".guide-knapper button:last-child"); if (b) b.focus(); });
-    };
-    function afslutGuide() {
-      if (guideTrin >= 0 && GUIDE[guideTrin].efter) GUIDE[guideTrin].efter();
-      guideTrin = -1;
-      [lag, lys, boble].forEach((x) => (x.hidden = true));
-      document.body.classList.remove("guide-aktiv");
-      document.querySelectorAll(".guide-maal").forEach((x) => x.classList.remove("guide-maal"));
-      try { localStorage.setItem(GUIDE_NOEGLE, "1"); } catch (e) {}
-      window.scrollTo(0, 0);
-      $("soegefelt").focus();
-    }
-    addEventListener("resize", placer);
-    document.addEventListener("keydown", (e) => { if (guideTrin >= 0 && e.key === "Escape") afslutGuide(); });
-    $("vis-guide").addEventListener("click", () => { visVisning("soeg"); lukSpiller(); visBesked(""); $("resultater").replaceChildren(); setTimeout(() => visTrin(0), 30); });
-    let guideSet = false;
-    try { guideSet = localStorage.getItem(GUIDE_NOEGLE) === "1"; } catch (e) {}
-    if (!guideSet && location.hash !== "#alle") setTimeout(() => visTrin(0), 300);
-    const dlg = $("hjaelp-dialog");
-    $("hjaelp-knap").addEventListener("click", () => dlg.showModal());
-    dlg.addEventListener("click", (e) => { if (e.target === dlg || e.target.closest("[data-luk]")) dlg.close(); });
     // Startside: før der er søgt eller åbnet noget, fylder toppen det meste af skærmen.
     const opdaterStart = () => {
       const tom = !$("side-soeg").hidden && !$("visning-soeg").hidden && !$("resultater").children.length && !$("besked").textContent.trim() && $("spiller-sektion").hidden && $("indlaeser").hidden;
